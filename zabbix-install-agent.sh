@@ -1,6 +1,7 @@
 #!/bin/bash
 # Ubuntu Agent Install, probably will work on Debian too
 # Make sure you have tcp 10051 open or fowarding to your Zabbix Server/Proxy
+# StartAgents=0 disables passive checks
 DOMAIN="example.com"
 VERSION="3.4"
 RELEASE="1"
