@@ -24,7 +24,6 @@ apt install -y zabbix-agent
  
 sed -i "s/^Server=.*/Server=${PASSIVE_PROXIES_FQDN}/g" $ZABBIX_AGENT_CONFIG
 sed -i "s/^ServerActive=.*/ServerActive=${ACTIVE_PROXIES_FQDN}/g" $ZABBIX_AGENT_CONFIG
-HostMetadataItem=system.unamesed -i "s/^Hostname=.*/Hostname=${HOSTNAME}/g" $ZABBIX_AGENT_CONFIG
-sed -i "s/^HostMetadataItem=.*/HostMetadataItem=${HostMetadataItem}/g" $ZABBIX_AGENT_CONFIG
-sed -i -E "s/^(# |)HostMetadataItem=.*/HostMetadataItem=system.uname/g" /etc/zabbix/zabbix_agentd.conf
+sed -i "s/^Hostname=.*/Hostname=${HOSTNAME}/g" $ZABBIX_AGENT_CONFIG
+sed -i -E "s/^(# |)HostMetadataItem=.*/HostMetadataItem=system.uname/g" $ZABBIX_AGENT_CONFIG
 systemctl restart zabbix-agent
