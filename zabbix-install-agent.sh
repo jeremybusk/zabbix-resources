@@ -9,7 +9,7 @@ RELEASE="1"
 ZABBIX_AGENT_CONFIG="/etc/zabbix/zabbix_agentd.conf"
 HOSTNAME=`hostname`
 CODENAME=$(cat /etc/*release | grep DISTRIB_CODENAME | awk -F= '{print $2}')
-DISTRO="cat /etc/*release | grep "^ID=" | awk -F= '{print $2}'"
+DISTRO=$(cat /etc/*release | grep '^ID=' | awk -F= '{print $2}')
 
 rm zabbix-release_${VERSION}-${RELEASE}+${CODENAME}_all.deb
 cmd="wget http://repo.zabbix.com/zabbix/${VERSION}/${DISTRO}/pool/main/z/zabbix-release/zabbix-release_${VERSION}-${RELEASE}+${CODENAME}_all.deb"
