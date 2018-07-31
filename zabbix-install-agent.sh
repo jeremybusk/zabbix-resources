@@ -26,4 +26,6 @@ sed -i "s/^Server=.*/Server=${PASSIVE_PROXIES_FQDN}/g" $ZABBIX_AGENT_CONFIG
 sed -i "s/^ServerActive=.*/ServerActive=${ACTIVE_PROXIES_FQDN}/g" $ZABBIX_AGENT_CONFIG
 sed -i "s/^Hostname=.*/Hostname=${HOSTNAME}/g" $ZABBIX_AGENT_CONFIG
 sed -i -E "s/^(# |)HostMetadataItem=.*/HostMetadataItem=system.uname/g" $ZABBIX_AGENT_CONFIG
+# sed -i -E "s/^(# |)StartAgents=.*/StartAgents=0/g" $ZABBIX_AGENT_CONFIG # disables passive agent listener
 systemctl restart zabbix-agent
+systemctl enable zabbix-agent
