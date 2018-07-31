@@ -1,5 +1,5 @@
-#!/bin/bash
-# Ubuntu Agent Install, probably will work on Debian too
+#!/usr/bin/env bash 
+#Agent Install, probably will work on Debian too
 # Make sure you have tcp 10051 open or fowarding to your Zabbix Server/Proxy
 # StartAgents=0 disables passive checks
 DOMAIN="example.com"
@@ -8,13 +8,22 @@ VERSION="3.4"
 RELEASE="1"
 ZABBIX_AGENT_CONFIG="/etc/zabbix/zabbix_agentd.conf"
 HOSTNAME=`hostname -f`
-CODENAME=$(cat /etc/*release | grep DISTRIB_CODENAME | awk -F= '{print $2}')
 DISTRO=$(cat /etc/*release | grep '^ID=' | awk -F= '{print $2}')
+echo $DISTRO
 
+if [[ "${DISTRO}" == "debian" ]]; then
+    CODENAME="stretch"
+else
+    CODENAME=$(cat /etc/*release | grep DISTRIB_CODENAME | awk -F= '{print $2}')
+fi
+
+apt remove -y --purge zabbix-agent
 rm zabbix-release_${VERSION}-${RELEASE}+${CODENAME}_all.deb
 cmd="wget http://repo.zabbix.com/zabbix/${VERSION}/${DISTRO}/pool/main/z/zabbix-release/zabbix-release_${VERSION}-${RELEASE}+${CODENAME}_all.deb"
 echo $cmd
+sleep 10
 eval $cmd
+sleep 10
 
 PASSIVE_PROXIES_FQDN="monitor-proxies-passive.${DOMAIN}"
 ACTIVE_PROXIES_FQDN="monitor-proxies-active.${DOMAIN}"
