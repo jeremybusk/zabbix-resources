@@ -3,6 +3,7 @@
 # Make sure you have tcp 10051 open or fowarding to your Zabbix Server/Proxy
 # StartAgents=0 disables passive checks
 DOMAIN="example.com"
+HostMetadataItem="system.uname"
 VERSION="3.4"
 RELEASE="1"
 ZABBIX_AGENT_CONFIG="/etc/zabbix/zabbix_agentd.conf"
@@ -23,5 +24,7 @@ apt install -y zabbix-agent
  
 sed -i "s/^Server=.*/Server=${PASSIVE_PROXIES_FQDN}/g" $ZABBIX_AGENT_CONFIG
 sed -i "s/^ServerActive=.*/ServerActive=${ACTIVE_PROXIES_FQDN}/g" $ZABBIX_AGENT_CONFIG
-sed -i "s/^Hostname=.*/Hostname=${HOSTNAME}/g" $ZABBIX_AGENT_CONFIG
+HostMetadataItem=system.unamesed -i "s/^Hostname=.*/Hostname=${HOSTNAME}/g" $ZABBIX_AGENT_CONFIG
+sed -i "s/^HostMetadataItem=.*/HostMetadataItem=${HostMetadataItem}/g" $ZABBIX_AGENT_CONFIG
+sed -i -E "s/^(# |)HostMetadataItem=.*/HostMetadataItem=system.uname/g" /etc/zabbix/zabbix_agentd.conf
 systemctl restart zabbix-agent
