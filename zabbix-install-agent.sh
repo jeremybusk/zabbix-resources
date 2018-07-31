@@ -7,7 +7,7 @@ HostMetadataItem="system.uname"
 VERSION="3.4"
 RELEASE="1"
 ZABBIX_AGENT_CONFIG="/etc/zabbix/zabbix_agentd.conf"
-HOSTNAME=`hostname`
+HOSTNAME=`hostname -f`
 CODENAME=$(cat /etc/*release | grep DISTRIB_CODENAME | awk -F= '{print $2}')
 DISTRO=$(cat /etc/*release | grep '^ID=' | awk -F= '{print $2}')
 
