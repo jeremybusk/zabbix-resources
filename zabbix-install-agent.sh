@@ -4,7 +4,7 @@
 # StartAgents=0 disables passive checks
 DOMAIN="example.com"
 HostMetadataItem="system.uname"
-VERSION="3.4"
+VERSION="4.0"
 RELEASE="1"
 ZABBIX_AGENT_CONFIG="/etc/zabbix/zabbix_agentd.conf"
 HOSTNAME=`hostname -f`
