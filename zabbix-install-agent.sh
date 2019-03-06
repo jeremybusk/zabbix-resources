@@ -17,7 +17,7 @@ else
     CODENAME=$(cat /etc/*release | grep DISTRIB_CODENAME | awk -F= '{print $2}')
 fi
 
-apt remove -y --purge zabbix-agent
+sudo apt remove -y --purge zabbix-agent
 rm zabbix-release_${VERSION}-${RELEASE}+${CODENAME}_all.deb
 cmd="wget http://repo.zabbix.com/zabbix/${VERSION}/${DISTRO}/pool/main/z/zabbix-release/zabbix-release_${VERSION}-${RELEASE}+${CODENAME}_all.deb"
 echo $cmd
@@ -28,13 +28,13 @@ sleep 10
 PASSIVE_PROXIES_FQDN="monitor-proxies-passive.${DOMAIN}"
 ACTIVE_PROXIES_FQDN="monitor-proxies-active.${DOMAIN}"
 dpkg -i zabbix-release_${VERSION}-${RELEASE}+${CODENAME}_all.deb
-apt update
-apt install -y zabbix-agent
+sudo apt update
+sudo apt install -y zabbix-agent
  
-sed -i "s/^Server=.*/Server=${PASSIVE_PROXIES_FQDN}/g" $ZABBIX_AGENT_CONFIG
-sed -i "s/^ServerActive=.*/ServerActive=${ACTIVE_PROXIES_FQDN}/g" $ZABBIX_AGENT_CONFIG
-sed -i "s/^Hostname=.*/Hostname=${HOSTNAME}/g" $ZABBIX_AGENT_CONFIG
-sed -i -E "s/^(# |)HostMetadataItem=.*/HostMetadataItem=system.uname/g" $ZABBIX_AGENT_CONFIG
+sudo sed -i "s/^Server=.*/Server=${PASSIVE_PROXIES_FQDN}/g" $ZABBIX_AGENT_CONFIG
+sudo sed -i "s/^ServerActive=.*/ServerActive=${ACTIVE_PROXIES_FQDN}/g" $ZABBIX_AGENT_CONFIG
+sudo sed -i "s/^Hostname=.*/Hostname=${HOSTNAME}/g" $ZABBIX_AGENT_CONFIG
+sudo sed -i -E "s/^(# |)HostMetadataItem=.*/HostMetadataItem=system.uname/g" $ZABBIX_AGENT_CONFIG
 # sed -i -E "s/^(# |)StartAgents=.*/StartAgents=0/g" $ZABBIX_AGENT_CONFIG # disables passive agent listener
-systemctl restart zabbix-agent
-systemctl enable zabbix-agent
+sudo systemctl restart zabbix-agent
+sudo systemctl enable zabbix-agent
