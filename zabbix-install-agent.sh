@@ -5,7 +5,7 @@
 DOMAIN="example.com"
 HostMetadataItem="system.uname"
 VERSION="4.0"
-RELEASE="1"
+RELEASE="2"
 ZABBIX_AGENT_CONFIG="/etc/zabbix/zabbix_agentd.conf"
 HOSTNAME=`hostname -f`
 DISTRO=$(cat /etc/*release | grep '^ID=' | awk -F= '{print $2}')
