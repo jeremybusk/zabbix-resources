@@ -138,7 +138,6 @@ def main():
                         default='https://monitor.uvoo.io/zabbix/api_jsonrpc.php',
                         help='Zabbix API to create screen from')
     parser.add_argument('-H', '--hostname', required=True, type=str,
-                        default='https://monitor.uvoo.io/zabbix/api_jsonrpc.php',
                         help='Zabbix Host to create screen from')
     parser.add_argument('-u', '--username', required=False, type=str,
                         default='admin',
