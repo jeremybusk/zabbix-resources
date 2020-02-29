@@ -187,8 +187,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
-</syntaxhighlight>
-
-[[Category:Python]]
-[[Category:Scripts]]
