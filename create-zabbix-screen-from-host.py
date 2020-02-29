@@ -1,4 +1,17 @@
 #!/usr/bin/env python3
+#
+# apt install python3-requests
+#
+# or using virtual env
+#
+# apt insatll python3-venv
+# python3 -m venv venv
+# source venv/bin/activate
+# pip install -U wheel pip
+# pip install requests
+
+# ./zabbix-create-screen-from-host.py --hostname "myhost.example.com" --screenname "myhost.example.com-screen" -u myadmin -p myadminpass
+
 import math
 import requests
 import json
@@ -135,7 +148,7 @@ def main():
     parser = argparse.ArgumentParser(description='Create Zabbix screen from all of a host Items or Graphs.')
     # parser.add_argument('hostname', metavar='H', type=str,
     parser.add_argument('--url', required=False, type=str,
-                        default='https://monitor.uvoo.io/zabbix/api_jsonrpc.php',
+                        default='https://monitor.example.com/zabbix/api_jsonrpc.php',
                         help='Zabbix API to create screen from')
     parser.add_argument('-H', '--hostname', required=True, type=str,
                         help='Zabbix Host to create screen from')
@@ -174,3 +187,8 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+</syntaxhighlight>
+
+[[Category:Python]]
+[[Category:Scripts]]
