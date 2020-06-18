@@ -1,0 +1,68 @@
+#!/usr/bin/env bash
+set -e
+# externalscripts, alertscripts in git@git.uvoo.io:systems/zabbix-{name} /usr/lib/zabbix//{name}
+check_every=120
+scripts_dir="/usr/lib/zabbix"
+id="/root/svc-zabbix"  # ssh secret key
+export GIT_SSH_COMMAND="ssh -i ${id}"
+wd=$(pwd)
+repo_prefix="git@git.myrepo.io:systems/zabbix-"
+
+
+check_if_remote_repo_changes() {
+  name=$1
+  local_repo="zabbix-${1}"
+  cd "${local_repo}"
+  git fetch --quiet origin master
+  r=$(git diff origin/master -- ./)
+  if [[ "$r" = *diff* ]]; then
+    echo "Changes detected. Update local repo for ${name} with remote."
+    refresh_scripts "${name}"
+  fi
+  cd ..
+}
+
+
+init_local_repo() {
+  name=$1
+  local_repo="zabbix-${name}"
+  echo "Init ${local_repo} and refresh all scripts."
+  rm -rf "${local_repo}"
+  git clone "${repo_prefix}${name}.git"
+  cd "${local_repo}"
+  refresh_scripts "${name}"
+  cd ..
+}
+
+
+refresh_scripts() {
+  name=$1
+  dir="${scripts_dir}/$name"
+  echo "Refreshing ${dir} directory."
+  tmpdir=$(mktemp -d -t zabbix_external.XXXXXXXXXX)
+  # find "${dir}" -mindepth 1 -delete  # deletes all files first
+  git clone "${repo_prefix}${name}.git" "${tmpdir}"
+  rm -rf "${tmpdir}/.git"
+  chmod 0550 -R "${tmpdir}"
+  chmod 0440 "${tmpdir}/README.md" || true
+  chown -R zabbix:zabbix "${tmpdir}"
+  cp -rp "${tmpdir}/"* "${dir}"
+  rm -rf ${tmpdir}
+  echo "Running git pull to update repo."
+  git pull # Update local repo with remote
+  echo "Success! Completed refresh of ${dir} directory."
+}
+
+
+main() {
+ echo "Starting zabbix external in working directory ${wd}"
+ init_local_repo externalscripts
+ init_local_repo alertscripts
+  while true; do
+   sleep ${check_every}
+   check_if_remote_repo_changes externalscripts
+   check_if_remote_repo_changes alertscripts
+   done
+}
+
+main
