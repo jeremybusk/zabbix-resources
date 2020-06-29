@@ -10,13 +10,15 @@
 # pip install -U wheel pip
 # pip install requests
 
-# ./zabbix-create-screen-from-host.py --hostname "myhost.example.com" --screenname "myhost.example.com-screen" -u myadmin -p myadminpass
+#!/usr/bin/env python3
+# ./zabbix-create-screen-from-host.py -k --hostname "myhost.example.com" --screenname "myhost.example.com-screen" -u myadmin -p myadminpass
 # export CURL_CA_BUNDLE=""  # disable invalid cert
 
+import argparse
+from getpass import getpass
+import json
 import math
 import requests
-import json
-import argparse
 import sys
 
 
@@ -149,18 +151,18 @@ def main():
     parser = argparse.ArgumentParser(description='Create Zabbix screen from all of a host Items or Graphs.')
     # parser.add_argument('hostname', metavar='H', type=str,
     parser.add_argument('--url', required=False, type=str,
-                        default='https://monitor.example.com/zabbix/api_jsonrpc.php',
+                        default='https://monitor.example.com/api_jsonrpc.php',
                         help='Zabbix API to create screen from')
     parser.add_argument('-H', '--hostname', required=True, type=str,
                         help='Zabbix Host to create screen from')
     parser.add_argument('-u', '--username', required=False, type=str,
-                        default='admin',
                         help='Zabbix API user to create screen from')
     parser.add_argument('-k', '--insecure', action='store_true',
                         help='Disable ssl verification')
     parser.add_argument('-p', '--password', required=False, type=str,
-                        default='admin',
                         help='Zabbix API userpass to create screen from')
+    parser.add_argument('-P', '--password-prompt', action='store_true', dest='password',
+                        help='hidden password prompt')
     parser.add_argument('-s', '--screenname', required=True, type=str,
                         help='Screen name in Zabbix.  Put quotes around it if you want spaces in the name.')
     parser.add_argument('-c', dest='columns', type=int, default=3,
@@ -169,8 +171,13 @@ def main():
                         help='enable for dynamic screen items (default: disabled)')
     parser.add_argument('-t', dest='screentype', action='store_true',
                         help='set to 1 if you want to create only simple graphs of items, no previously defined graphs will be added to screen (default 0)')
-
     args = parser.parse_args()
+    if not args.password:
+        args.password = getpass()
+    global session
+    session = requests.Session()
+    if args.insecure:
+        session.verify = False
     hostname = args.hostname
     screen_name = args.screenname
     username = args.username
@@ -180,10 +187,6 @@ def main():
     dynamic = (1 if args.dynamic else 0)
     screentype = (1 if args.screentype else 0)
 
-    global session
-    session = requests.Session()
-    if args.insecure:
-        session.verify = False
 
     auth = authenticate(url, username, password)
     graphids = getGraph(hostname, url, auth, screentype, dynamic, columns)
