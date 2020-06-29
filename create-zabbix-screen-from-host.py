@@ -11,6 +11,7 @@
 # pip install requests
 
 # ./zabbix-create-screen-from-host.py --hostname "myhost.example.com" --screenname "myhost.example.com-screen" -u myadmin -p myadminpass
+# export CURL_CA_BUNDLE=""  # disable invalid cert
 
 import math
 import requests
@@ -30,7 +31,7 @@ def authenticate(url, username, password):
               }
 
     headers = {'Content-Type': 'application/json-rpc'}
-    response = requests.post(url, data = json.dumps(payload), headers = headers);
+    response = session.post(url, data = json.dumps(payload), headers = headers);
     data = response.json()
 
     try:
@@ -65,7 +66,7 @@ def getGraph(hostname, url, auth, graphtype, dynamic, columns):
               'id': '2'
               }
     headers = {'Content-Type': 'application/json-rpc'}
-    response = requests.post(url, data = json.dumps(payload), headers = headers);
+    response = session.post(url, data = json.dumps(payload), headers = headers);
     data = response.json()
     if len(data['result']) <= 0:
         # raise ValueError("Host has no metric items to graph. Does host exist?")
@@ -131,7 +132,7 @@ def screenCreate(url, auth, screen_name, graphids, columns):
         payload['params'][0]['screenitems'].append(i)
 
     headers = {'Content-Type': 'application/json-rpc'}
-    response = requests.post(url, data = json.dumps(payload), headers = headers);
+    response = session.post(url, data = json.dumps(payload), headers = headers);
     data = response.json()
     # data = json.loads(response.text)
 
@@ -155,6 +156,8 @@ def main():
     parser.add_argument('-u', '--username', required=False, type=str,
                         default='admin',
                         help='Zabbix API user to create screen from')
+    parser.add_argument('-k', '--insecure', action='store_true',
+                        help='Disable ssl verification')
     parser.add_argument('-p', '--password', required=False, type=str,
                         default='admin',
                         help='Zabbix API userpass to create screen from')
@@ -176,6 +179,11 @@ def main():
     columns = args.columns
     dynamic = (1 if args.dynamic else 0)
     screentype = (1 if args.screentype else 0)
+
+    global session
+    session = requests.Session()
+    if args.insecure:
+        session.verify = False
 
     auth = authenticate(url, username, password)
     graphids = getGraph(hostname, url, auth, screentype, dynamic, columns)
