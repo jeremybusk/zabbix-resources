@@ -1,4 +1,8 @@
 # Simple cli metric getter for Windows powershell
+# edit C:\Program Files\zabbix\zabbix_agent2.conf
+# UserParameter=get[*],powershell.exe -NoProfile -File C:\Program Files\zabbix\get.ps1 $1
+# restart-service "Zabbix Agent 2"
+
 $function=$Args[0]
 
 if(-not($function)) {
