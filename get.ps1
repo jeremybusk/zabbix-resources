@@ -4,7 +4,6 @@
 # restart-service "Zabbix Agent 2"
 
 $function=$Args[0]
-
 if(-not($function)) {
   write-host "Usage: <metric function to execute>"
   write-host "Example: battery-status"
@@ -41,6 +40,12 @@ function get_battery_charge_mult(){
   # get battery charge for one or more batteries:
   $charge = Get-CimInstance -ClassName Win32_Battery | Measure-Object -Property EstimatedChargeRemaining -Average | Select-Object -ExpandProperty Average
   "Current Charge: $charge %."
+}
+
+
+function get_url_response_latency($url){
+  $get_time = curl.exe "$url" -s -o /dev/null -w  "%{time_starttransfer}\n"
+  $get_time
 }
 
 
@@ -82,15 +87,24 @@ function battery-status() {
   }
 
   Get-CimInstance -ClassName Win32_Battery | Select-Object -Property DeviceID, BatteryStatus, $BatteryStatus
-
 }
 
 
-function main() {
+function main([string[]] $margs) {
   if ($function -eq "battery-status"){
     (battery-status)."BatteryStatus"
+  }elseif ($function -eq "url-response-latency"){
+    if(-not($margs[1])) {
+      write-host "Usage: url-response-latency <url>"
+      write-host "Example: url-response-latency https://www.cisco.com/"
+      exit
+    }
+    $url=$margs[1]
+    get_url_response_latency($url)
   }elseif ($function -eq "return1"){
     return1
+  }elseif ($function -eq "battery-runtime"){
+    get_battery_runtime
   }else{
     write-host "E: Metric function $function is not supported!"
     battery-count
@@ -98,4 +112,4 @@ function main() {
 }
 
 
-main
+main($args)
