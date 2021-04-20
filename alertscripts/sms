@@ -1,0 +1,79 @@
+#!/usr/bin/env python3
+
+from pprint import pprint
+import requests
+import sys
+
+import vonage
+
+# mangement url https://dashboard.vonage.com/
+application_id = "<your id>"
+phone_from = '<your nexmo/vonage phone>'
+sms_key = '<your sms key>'
+sms_secret = '<your sms secret>'
+
+
+def main():
+    if len(sys.argv) < 4:
+        print(f"Usage: {sys.argv[0]} <phone_to> <subject> <text>")
+        print(f'Example: {sys.argv[0]} 1801xxxyyyy "Yo Test" "This is a test"')
+        sys.exit()
+    phone_to = sys.argv[1]
+    subject = sys.argv[2]
+    phone_text = sys.argv[3]
+    phone_text = f"subject: {subject} body: {phone_text}"
+    private_key = get_vonage_key()
+
+    # call(phone_from, phone_to, phone_text, application_id, private_key)
+    text(phone_from, phone_to, phone_text, sms_key, sms_secret)
+
+
+def get_vonage_key():
+    with open('/var/lib/zabbix/vonage_<your private key>_private.key') as f:
+        vonage_key = f.read()
+    return vonage_key
+
+
+def call(phone_from, phone_to, phone_text, application_id, private_key):
+    client = vonage.Client(
+    application_id=application_id,
+    private_key=private_key, )
+
+    ncco = [
+      {
+        'action': 'talk',
+        'voiceName': 'Kendra',
+        'text': phone_text
+      }
+    ]
+
+    response = client.create_call({
+      'to': [{
+        'type': 'phone',
+        'number': phone_to
+      }],
+      'from': {
+        'type': 'phone',
+        'number': phone_from
+      },
+      'ncco': ncco
+    })
+
+    pprint(response)
+
+
+def text(phone_from, phone_to, phone_text, sms_key, sms_secret):
+    client = vonage.Client(key=sms_key, secret=sms_secret)
+    sms = vonage.Sms(client)
+
+    responseData = sms.send_message(
+        {
+            "from": phone_from,
+            "to": phone_to,
+            "text": phone_text,
+        }
+    )
+
+
+if __name__ == "__main__":
+    main()
