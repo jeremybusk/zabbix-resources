@@ -12,7 +12,9 @@ import vonage
 dotenv_path = join(dirname(__file__), '.env')
 load_dotenv(dotenv_path)
 VONAGE_APPLICATION_ID = os.getenv("VONAGE_APPLICATION_ID")
-VONAGE_APPLICATION_SECRET_KEY = base64.b64decode(os.getenv("VONAGE_APPLICATION_SECRET_KEY64"))
+VONAGE_APPLICATION_SECRET_KEY64 = os.getenv("VONAGE_APPLICATION_SECRET_KEY64")
+key = base64.b64decode(VONAGE_APPLICATION_SECRET_KEY64).decode()
+VONAGE_APPLICATION_SECRET_KEY = key
 VONAGE_PHONE_FROM = os.getenv("VONAGE_PHONE_FROM")
 VONAGE_SMS_KEY = os.getenv("VONAGE_SMS_KEY")
 VONAGE_SMS_SECRET = os.getenv('VONAGE_SMS_SECRET')
@@ -20,8 +22,8 @@ VONAGE_SMS_SECRET = os.getenv('VONAGE_SMS_SECRET')
 
 def main():
     if len(sys.argv) < 5:
-        print(f"Usage: {sys.argv[0]} <text/call> <phone_to> <subject> <msg text>")
-        print(f'Example: {sys.argv[0]} 1801xxxyyyy "My Subject" "This is a test."')
+        print(f"Usage: {sys.argv[0]} <text/call> <phone_to> <subject> <msg>")
+        print(f'Example: {sys.argv[0]} 1801xxxyyyy "My subject" "msg text"')
         sys.exit()
     action = sys.argv[1]
     phone_to = sys.argv[2]
@@ -30,28 +32,31 @@ def main():
     phone_text = f"{subject}\n{message}"
 
     if action == "call":
-        call(VONAGE_PHONE_FROM, phone_to, phone_text, VONAGE_APPLICATION_ID, VONAGE_APPLICATION_SECRET_KEY)
+        call(VONAGE_PHONE_FROM, phone_to, phone_text, VONAGE_APPLICATION_ID,
+             VONAGE_APPLICATION_SECRET_KEY)
     elif action == "text":
-        text(VONAGE_PHONE_FROM, phone_to, phone_text, VONAGE_SMS_KEY, VONAGE_SMS_SECRET)
+        text(VONAGE_PHONE_FROM, phone_to, phone_text, VONAGE_SMS_KEY,
+             VONAGE_SMS_SECRET)
     else:
         return f"Unsupported action {action}"
 
 
-def call(VONAGE_PHONE_FROM, phone_to, phone_text, VONAGE_APPLICATION_ID, VONAGE_APPLICATION_SECRET_KEY):
-    client = vonage.Client(
-    application_id=VONAGE_APPLICATION_ID,
-    private_key=VONAGE_APPLICATION_SECRET_KEY, )
+def call(VONAGE_PHONE_FROM, phone_to, phone_text, VONAGE_APPLICATION_ID,
+         VONAGE_APPLICATION_SECRET_KEY):
+    client = vonage.Client(application_id=VONAGE_APPLICATION_ID,
+                           private_key=VONAGE_APPLICATION_SECRET_KEY, )
     voice = vonage.Voice(client)
     responseData = voice.create_call({
         'to': [{'type': 'phone', 'number': phone_to}],
         'from': {'type': 'phone', 'number': VONAGE_PHONE_FROM},
-        'ncco': [{'action': 'talk', 'voiceName': 'Kendra', 'text': 'This is a text to speech call from Nexmo'}]
+        'ncco': [{'action': 'talk', 'voiceName': 'Kendra',
+                  'text': 'This is a text to speech call from Nexmo'}]
     })
     pprint(responseData)
 
 
-
-def text(VONAGE_PHONE_FROM, phone_to, phone_text, VONAGE_SMS_KEY, VONAGE_SMS_SECRET):
+def text(VONAGE_PHONE_FROM, phone_to, phone_text, VONAGE_SMS_KEY,
+         VONAGE_SMS_SECRET):
     client = vonage.Client(key=VONAGE_SMS_KEY, secret=VONAGE_SMS_SECRET)
     sms = vonage.Sms(client)
     responseData = sms.send_message(
