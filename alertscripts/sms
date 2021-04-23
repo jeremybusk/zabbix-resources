@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 
 from pprint import pprint
-import requests
-import sys
+# import requests
+# import sys
 
 import vonage
 
@@ -21,7 +21,7 @@ def main():
     phone_to = sys.argv[1]
     subject = sys.argv[2]
     phone_text = sys.argv[3]
-    phone_text = f"subject: {subject} body: {phone_text}"
+    phone_text = f"subject: {subject}\nbody: {phone_text}"
     private_key = get_vonage_key()
 
     # call(phone_from, phone_to, phone_text, application_id, private_key)
