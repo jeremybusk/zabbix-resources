@@ -1,0 +1,50 @@
+# Simple check to see if tcp port is up. Uses TCP_PORT macro port for checking
+zabbix_export:
+  version: '5.4'
+  date: '2022-02-21T00:58:02Z'
+  groups:
+    -
+      uuid: 65cd97cf9bca4ae589fc8f58dc43500a
+      name: Templates/eh
+  templates:
+    -
+      uuid: a480136db9c34a248d303ac5dae2bf9f
+      template: tcp-port
+      name: tcp-port
+      groups:
+        -
+          name: Templates/eh
+      items:
+        -
+          uuid: 7eb8d012f4b64162ae449d176179787c
+          name: 'tcp port {$TCP_PORT} up'
+          type: SIMPLE
+          key: 'net.tcp.service[tcp,,{$TCP_PORT}]'
+          history: 1w
+          valuemap:
+            name: 'Service state'
+          tags:
+            -
+              tag: Application
+              value: tcp-port
+          triggers:
+            -
+              uuid: 5a301baebf6a4e9d86c42225e7462489
+              expression: 'max(/tcp-port/net.tcp.service[tcp,,{$TCP_PORT}],#3)=0'
+              name: 'tcp port {$TCP_PORT} is down on {HOST.NAME}'
+              priority: INFO
+      macros:
+        -
+          macro: '{$TCP_PORT}'
+          value: '443'
+      valuemaps:
+        -
+          uuid: aedb3a25de3a401f803be88e7de6a99f
+          name: 'Service state'
+          mappings:
+            -
+              value: '0'
+              newvalue: Down
+            -
+              value: '1'
+              newvalue: Up
